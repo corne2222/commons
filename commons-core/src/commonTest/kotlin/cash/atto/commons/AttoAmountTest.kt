@@ -42,6 +42,12 @@ internal class AttoAmountTest {
     }
 
     @Test
+    fun `should format cash unit`() {
+        val amount = AttoAmount.from(AttoUnit.CASH, "2.500000001")
+        assertEquals("2.500000001", amount.toString(AttoUnit.CASH))
+    }
+
+    @Test
     fun overflow() {
         try {
             AttoAmount.MAX + AttoAmount.MAX
