@@ -4,6 +4,8 @@ import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoChallenge
 import cash.atto.commons.AttoInstant
 import cash.atto.commons.AttoNetwork
+import cash.atto.commons.AttoNetworkConfiguration
+import cash.atto.commons.AttoNetworkConfigurations
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoSigner
@@ -123,8 +125,13 @@ fun AttoAuthenticator.Companion.custom(
 fun AttoAuthenticator.Companion.attoBackend(
     network: AttoNetwork,
     signer: AttoSigner,
+): AttoAuthenticator = attoBackend(AttoNetworkConfigurations.configuration(network), signer)
+
+fun AttoAuthenticator.Companion.attoBackend(
+    configuration: AttoNetworkConfiguration,
+    signer: AttoSigner,
 ): AttoAuthenticator {
-    val url = "https://wallet-gatekeeper.${network.name.lowercase()}.application.atto.cash"
+    val url = configuration.endpoints.walletGatekeeperUrl
     return WalletGatekeeperClient(url, signer)
 }
 
@@ -140,20 +147,35 @@ fun AttoAuthenticator.toHeaderProvider(): suspend () -> Map<String, String> =
 fun AttoNodeClient.Companion.attoBackend(
     network: AttoNetwork,
     authenticator: AttoAuthenticator,
+): AttoNodeClient = attoBackend(AttoNetworkConfigurations.configuration(network), authenticator)
+
+fun AttoNodeClient.Companion.attoBackend(
+    configuration: AttoNetworkConfiguration,
+    authenticator: AttoAuthenticator,
 ): AttoNodeClient {
-    val gatekeeperUrl = "https://gatekeeper.${network.name.lowercase()}.application.atto.cash"
-    return AttoNodeClient.remote(gatekeeperUrl, authenticator.toHeaderProvider())
+    val nodeUrl = configuration.endpoints.nodeUrl
+    return AttoNodeClient.remote(nodeUrl, authenticator.toHeaderProvider())
 }
 
 internal fun AttoWorker.Companion.attoBackend(
     network: AttoNetwork,
     headerProvider: suspend () -> Map<String, String> = { emptyMap() },
+): AttoWorker = attoBackend(AttoNetworkConfigurations.configuration(network), headerProvider)
+
+internal fun AttoWorker.Companion.attoBackend(
+    configuration: AttoNetworkConfiguration,
+    headerProvider: suspend () -> Map<String, String> = { emptyMap() },
 ): AttoWorker {
-    val gatekeeperUrl = "https://gatekeeper.${network.name.lowercase()}.application.atto.cash"
-    return AttoWorker.remote(gatekeeperUrl, headerProvider)
+    val workerUrl = configuration.endpoints.workerUrl
+    return AttoWorker.remote(workerUrl, headerProvider)
 }
 
 fun AttoWorker.Companion.attoBackend(
     network: AttoNetwork,
     authenticator: AttoAuthenticator,
-): AttoWorker = AttoWorker.attoBackend(network, authenticator.toHeaderProvider())
+): AttoWorker = AttoWorker.attoBackend(AttoNetworkConfigurations.configuration(network), authenticator)
+
+fun AttoWorker.Companion.attoBackend(
+    configuration: AttoNetworkConfiguration,
+    authenticator: AttoAuthenticator,
+): AttoWorker = AttoWorker.attoBackend(configuration, authenticator.toHeaderProvider())

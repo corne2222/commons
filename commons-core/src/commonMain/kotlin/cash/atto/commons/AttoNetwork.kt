@@ -12,6 +12,7 @@ enum class AttoNetwork(
     val thresholdIncreaseFactor: ULong,
 ) {
     LIVE(0U, 1u),
+    CASH(4U, 1u),
     BETA(1U, 10u),
     DEV(2U, 100u),
     LOCAL(3U, 100_000u),

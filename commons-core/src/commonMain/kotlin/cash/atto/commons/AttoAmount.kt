@@ -24,6 +24,7 @@ enum class AttoUnit(
     internal val scale: UByte,
 ) {
     ATTO("atto", 9U),
+    CASH("cash", 9U),
     RAW("raw", 0U),
 }
 
